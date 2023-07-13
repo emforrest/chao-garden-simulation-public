@@ -33,7 +33,7 @@ public class Shop {
 	}
 
 	public ArrayList<String> returnItems() {
-		//Return a list of items on sale. The variable items list changes each day
+		//Return a list of items on sale.
 		ArrayList<String> items = new ArrayList<String>();
 		this.todaysItems = rerollItems();
 		items.addAll(todaysItems);
