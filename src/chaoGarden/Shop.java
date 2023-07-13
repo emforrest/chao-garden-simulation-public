@@ -9,7 +9,7 @@ public class Shop {
 	private ArrayList<String> todaysItems = new ArrayList<String>();
 	
 	public Shop(String shopSeed) {
-		//Initialise the Shop with its fixed items and a first refreshed date
+		//Initialise the Shop with its fixed items
 		
 		//shopSeed is randomly picked for each user and determines which colour eggs are on sale
 		ArrayList<String> fixedEggs = new ArrayList<String>();
