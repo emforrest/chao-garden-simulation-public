@@ -1,5 +1,9 @@
 package chaoGarden;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -85,16 +89,17 @@ public class Chao {
             return this.jewel;
         }
         
-	public void interact() {
+	public boolean interact() {
 		//What to do when a Chao is selected in the Chao garden
 		String input1 = "";
-		String[] options1 = { "1", "2", "3", "B"};
+		String[] options1 = { "1", "2", "3", "4", "B"};
 		while (!Arrays.asList(options1).contains(input1)) {
 			System.out.println(this.nickname);
 			System.out.print("""
 1. Set Nickname
 2. View Appearance Attributes
 3. View Original Owner
+4. Say Goodbye
 B. Back
 >>>""");
 			input1 = scanner.next().toUpperCase();
@@ -116,6 +121,34 @@ Jewel: %s""", this.colour, this.tone, this.shiny, this.jewel));
                 else if (input1.equals("3")) {
                     System.out.println(String.format("Original Owner: %s", this.originalOwner));
                 }
+                else if (input1.equals("4")){
+                    String confirmed1 = "";
+                    while (!(confirmed1.equals("Y")) && !(confirmed1.equals("N"))){
+                        System.out.println(String.format("Say Goodbye to %s?", this.nickname));
+                        System.out.print("""
+Y. Yes
+N. No
+>>>""");
+                        confirmed1 = scanner.next().toUpperCase();
+                    }
+                    if (confirmed1.equals("Y")){
+                        String confirmed2 = "";
+                        while (!(confirmed2.equals("Y")) && !(confirmed2.equals("N"))){
+                            System.out.println(String.format("Are you sure you want to release this Chao? Your game will be saved and you will not see it again.", this.nickname));
+                            System.out.print("""
+Y. Yes
+N. No
+>>>""");
+                            confirmed2 = scanner.next().toUpperCase();
+                        }
+                        if (confirmed2.equals("Y")){
+                            System.out.println(String.format("Farewell, %s!", this.nickname));
+                            this.deleteChao();
+                            return true;
+                        }
+                    }
+                }
+                return false;
 	}
 	
 	public void editNickname() {
@@ -146,4 +179,22 @@ N. No
 		this.setNickname(newNickname);
 		System.out.println("Nickname set.");
 	}
+        
+        public void deleteChao(){
+            //Delete this chao
+            String url = "jdbc:mysql://132.145.50.130:3306/chaoGardenDatabase?enabledTLSProtocols=TLSv1.2";
+            String user = "java";
+            String pass = "password"; 
+            Connection connection;
+            try {
+                connection = DriverManager.getConnection(url, user, pass);
+                Statement statement1 = connection.createStatement();
+                statement1.execute(String.format("DELETE FROM Chaos WHERE ChaoID = \"%d\";", this.chaoID));
+                
+            } 
+            catch (SQLException e){
+                System.out.println("SQL Error.");
+            }
+            
+        }
 }

@@ -262,7 +262,7 @@ public class chaoGarden {
                             eggJewel = results4.getString("EggJewel");
                         }
                         ArrayList<String> parentAttributes = new ArrayList<String>(Arrays.asList(eggColour, eggTone, eggShiny, eggJewel));
-                        Egg egg = new Egg(parentAttributes, parentAttributes);
+                        Egg egg = new Egg(parentAttributes, parentAttributes, itemID);
                         bag.addItem(egg);
                     }
                 }
@@ -345,8 +345,9 @@ public class chaoGarden {
             return null;
         }
 	
-	private static void chaoGardenArea(Scanner scanner, ArrayList<Chao> chaoList) {
+	private static boolean chaoGardenArea(Scanner scanner, ArrayList<Chao> chaoList) {
 		//The control flow for the chao garden segment
+                boolean reloadRequired = false;
 		String input1 = "";
 		while (!input1.equals("B")) {
 			System.out.println("Chao Garden");
@@ -372,12 +373,14 @@ B. Back
 				int input1Int = Integer.valueOf(input1);
 				if (input1Int > 0 && input1Int <= chaoList.size()) {
 					Chao chosenChao = chaoList.get(input1Int - 1);
-					chosenChao.interact();
+					reloadRequired = chosenChao.interact();
+                                        return reloadRequired;
 				}
 			}
 			catch (NumberFormatException e) {			
 			}
 		}
+                return reloadRequired;
 	}
 	
 	private static void bag(Scanner scanner, String username) {
@@ -496,13 +499,13 @@ N. No
                     if(!inputUsername.equals(currentUser)){
                         //Select a Chao to be sent
                         String input1 = "";
-                        System.out.println("Select a Chao to gift:");
                         StringBuilder gardenContents = new StringBuilder();
 			ListIterator<Chao> iterator = chaoList.listIterator();
 			while(iterator.hasNext()) {
 				gardenContents.append((iterator.nextIndex()+1) + ". " + iterator.next().getNickname()+"\n");
 			}
                         while (!input1.equals("B")){
+                            System.out.println("Select a Chao to gift:");
                             System.out.print(gardenContents);
                             System.out.print("""
 B. Back
@@ -588,7 +591,7 @@ N. No
                     }
                     //Eggs created in this way are those bought in the shop so they do not require two sets of attributes
                     ArrayList<String> parentAttributes = new ArrayList(Arrays.asList(colour, tone, shiny, jewel));
-                    Egg egg = new Egg(parentAttributes, parentAttributes);
+                    Egg egg = new Egg(parentAttributes, parentAttributes, -1);
                     return egg;
                 }
                 ///etc
@@ -608,6 +611,21 @@ N. No
                 chaoList.add(hatchedChao);
                 bag.removeItem(egg);
                 System.out.println("Your egg hatched into a Chao!");
+            }
+            if (chosenAction.equals("Delete")){
+                bag.removeItem(item);
+                String url = "jdbc:mysql://132.145.50.130:3306/chaoGardenDatabase?enabledTLSProtocols=TLSv1.2";
+                String user = "java";
+                String pass = "password"; 
+                Connection connection;
+                try {
+                    connection = DriverManager.getConnection(url, user, pass);
+                    Statement statement1 = connection.createStatement();
+                    statement1.execute(String.format("DELETE FROM BagItems WHERE ItemID = \"%d\";", item.itemID));                
+                } 
+                catch (SQLException e){
+                    System.out.println("SQL Error.");
+                }
             }
         }
 
@@ -702,7 +720,12 @@ Q. Quit
                             }
 		
                             if (input2.equals("C")) {
-                                chaoGardenArea(scanner, chaoList);
+                                boolean reloadRequired = chaoGardenArea(scanner, chaoList);
+                                if (reloadRequired){
+                                    ObjectContainer obj = loadGame(username);
+                                    chaoList = obj.chaoList;
+                                    bag = obj.bag;
+                                }
                             }
                             else if (input2.equals("B")) {
                                 bag(scanner, username);

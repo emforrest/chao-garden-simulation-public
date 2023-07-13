@@ -15,8 +15,9 @@ public class Egg extends Item {
         
         private Scanner scanner = new Scanner(System.in);
 	
-	public Egg(ArrayList<String> parent1Attributes, ArrayList<String> parent2Attributes) {
-		this.parent1Attributes = parent1Attributes;
+	public Egg(ArrayList<String> parent1Attributes, ArrayList<String> parent2Attributes, int itemID) {
+		this.itemID = itemID;
+                this.parent1Attributes = parent1Attributes;
 		this.parent2Attributes = parent2Attributes;
 		generateColour();
 		generateTone();
@@ -146,12 +147,13 @@ public class Egg extends Item {
         public String interact(){
             //What to do when an item is selected in the bag
             String input1 = "";
-            String[] options1 = { "I", "H", "B"};
+            String[] options1 = { "I", "H", "D", "B"};
             while (!Arrays.asList(options1).contains(input1)) {
 		System.out.println(this.itemType);
 		System.out.print("""
 I. Info
 H. Hatch
+D. Discard
 B. Back
 >>>""");
 		input1 = scanner.next().toUpperCase();
@@ -162,8 +164,21 @@ B. Back
             else if (input1.equals("H")){
                 return "Hatch";
             }
-            else{
-                return "Back";
+            else if (input1.equals("D")){
+                String confirmed = "";
+                while (!(confirmed.equals("Y")) && !(confirmed.equals("N"))){
+                    System.out.println(String.format("Discard this %s?", this.itemType));
+                    System.out.print("""
+Y. Yes
+N. No
+>>>""");
+                    confirmed = scanner.next().toUpperCase();
+                }
+                if (confirmed.equals("Y")){
+                    return "Delete";
+                }
             }
+            return "Back";
+            
         }
 }

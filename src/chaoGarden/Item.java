@@ -1,6 +1,7 @@
 package chaoGarden;
 
 public abstract class Item {
+        protected int itemID;
 	protected String itemType;
 
 	public String getItemType() {
