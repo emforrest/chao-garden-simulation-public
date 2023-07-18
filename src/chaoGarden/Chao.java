@@ -16,15 +16,35 @@ public class Chao {
 	private String tone;
 	private String shiny;
 	private String jewel;
+        private char swimIV;
+        private char flyIV;
+        private char runIV;
+        private char powerIV;
+        private char staminaIV;
+        private int swimEV;
+        private int flyEV;
+        private int runEV;
+        private int powerEV;
+        private int staminaEV;
 	
 	private Scanner scanner = new Scanner(System.in);
 	
-	public Chao(String[] appearanceAttributes, String nickname, String originalOwner, int chaoID) {
+	public Chao(String[] appearanceAttributes, char[] ivs, int[] evs, String nickname, String originalOwner, int chaoID) {
                 this.chaoID = chaoID;
 		this.colour = appearanceAttributes[0];
 		this.tone = appearanceAttributes[1];
 		this.shiny = appearanceAttributes[2];
 		this.jewel = appearanceAttributes[3];
+                this.swimIV = ivs[0];
+                this.flyIV = ivs[1];
+                this.runIV = ivs[2];
+                this.powerIV = ivs[3];
+                this.staminaIV = ivs[4];
+                this.swimEV = evs[0];
+                this.flyEV = evs[1];
+                this.runEV = evs[2];
+                this.powerEV = evs[3];
+                this.staminaEV = evs[4];
                 if (nickname == null){
                     this.nickname = this.toString();
                 }
@@ -89,6 +109,46 @@ public class Chao {
             return this.jewel;
         }
         
+        public char getSwimIV(){
+            return this.swimIV;
+        }
+        
+        public int getSwimEV(){
+            return this.swimEV;
+        }
+        
+        public char getFlyIV(){
+            return this.flyIV;
+        }
+        
+        public int getFlyEV(){
+            return this.flyEV;
+        }
+        
+        public char getRunIV(){
+            return this.runIV;
+        }
+        
+        public int getRunEV(){
+            return this.runEV;
+        }
+        
+        public char getPowerIV(){
+            return this.powerIV;
+        }
+        
+        public int getPowerEV(){
+            return this.powerEV;
+        }
+        
+        public char getStaminaIV(){
+            return this.staminaIV;
+        }
+        
+        public int getStaminaEV(){
+            return this.staminaEV;
+        }
+        
 	public boolean interact() {
 		//What to do when a Chao is selected in the Chao garden
 		String input1 = "";
@@ -98,8 +158,9 @@ public class Chao {
 			System.out.print("""
 1. Set Nickname
 2. View Appearance Attributes
-3. View Original Owner
-4. Say Goodbye
+3. View Stats
+4. View Original Owner
+5. Say Goodbye
 B. Back
 >>>""");
 			input1 = scanner.next().toUpperCase();
@@ -119,9 +180,20 @@ Jewel: %s""", this.colour, this.tone, this.shiny, this.jewel));
 			scanner.next();
 		}
                 else if (input1.equals("3")) {
+			//Display the Chao's stat IVs and EVs
+			System.out.println(String.format("""
+Swim: %c +%d
+Fly: %c +%d
+Run: %c +%d
+Power: %c +%d
+Stamina: %c +%d""", this.swimIV, this.swimEV, this.flyIV, this.flyEV, this.runIV, this.runEV, this.powerIV, this.powerEV, this.staminaIV, this.staminaEV));
+			System.out.println("Input to continue:");
+			scanner.next();
+		}
+                else if (input1.equals("4")) {
                     System.out.println(String.format("Original Owner: %s", this.originalOwner));
                 }
-                else if (input1.equals("4")){
+                else if (input1.equals("5")){
                     String confirmed1 = "";
                     while (!(confirmed1.equals("Y")) && !(confirmed1.equals("N"))){
                         System.out.println(String.format("Say Goodbye to %s?", this.nickname));

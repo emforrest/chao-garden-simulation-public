@@ -215,6 +215,16 @@ public class chaoGarden {
                 String jewel;
                 String originalOwner;
                 String giftedFrom;
+                char swimIV;
+                int swimEV;
+                char flyIV;
+                int flyEV;
+                char runIV;
+                int runEV;
+                char powerIV;
+                int powerEV;
+                char staminaIV;
+                int staminaEV;
                 while (results2.next()){
                     Chao chao;
                     chaoID = results2.getInt("ChaoID");
@@ -223,6 +233,16 @@ public class chaoGarden {
                     tone = results2.getString("Tone");
                     shiny = results2.getString("Shiny");
                     jewel = results2.getString("Jewel");
+                    swimIV = results2.getString("swimIV").charAt(0);
+                    swimEV = results2.getInt("swimEV");
+                    flyIV = results2.getString("flyIV").charAt(0);
+                    flyEV = results2.getInt("flyEV");
+                    runIV = results2.getString("runIV").charAt(0);
+                    runEV = results2.getInt("runEV");
+                    powerIV = results2.getString("powerIV").charAt(0);
+                    powerEV = results2.getInt("powerEV");
+                    staminaIV = results2.getString("staminaIV").charAt(0);
+                    staminaEV = results2.getInt("staminaEV");
                     originalOwner = results2.getString("OriginalOwner");
                     giftedFrom = results2.getString("GiftedFrom");
                     if (giftedFrom != null){
@@ -234,7 +254,9 @@ public class chaoGarden {
                     }
                     
                     String[] appearanceAttributes = {colour, tone, shiny, jewel};
-                    chao = new Chao(appearanceAttributes, nickname, originalOwner, chaoID);
+                    char[] ivs = {swimIV, flyIV, runIV, powerIV, staminaIV};
+                    int[] evs = {swimEV, flyEV, runEV, powerEV, staminaEV};
+                    chao = new Chao(appearanceAttributes, ivs, evs, nickname, originalOwner, chaoID);
                     chaoList.add(chao);
                 }
                 
@@ -250,19 +272,31 @@ public class chaoGarden {
                     //get any related attributes and add the item
                     if (itemType.contains("Egg")){
                         Statement statement4 = connection.createStatement();
-                        ResultSet results4 = statement4.executeQuery(String.format("SELECT EggColour, EggTone, EggShiny, EggJewel FROM BagItems WHERE ItemID = \"%d\";", itemID));
+                        ResultSet results4 = statement4.executeQuery(String.format("SELECT EggColour, EggTone, EggShiny, EggJewel, EggSwimIV, EggFlyIV, EggRunIV, EggPowerIV, EggStaminaIV FROM BagItems WHERE ItemID = \"%d\";", itemID));
                         String eggColour = "";
                         String eggTone = "";
                         String eggShiny = "";
                         String eggJewel = "";
+                        char eggSwimIV = ' ';
+                        char eggFlyIV = ' ';
+                        char eggRunIV = ' ';
+                        char eggPowerIV = ' ';
+                        char eggStaminaIV = ' ';
+                        
                         while(results4.next()){
                             eggColour = results4.getString("EggColour");
                             eggTone = results4.getString("EggTone");
                             eggShiny = results4.getString("EggShiny");
                             eggJewel = results4.getString("EggJewel");
+                            eggSwimIV = results4.getString("EggSwimIV").charAt(0);
+                            eggFlyIV = results4.getString("EggFlyIV").charAt(0);
+                            eggRunIV = results4.getString("EggRunIV").charAt(0);
+                            eggPowerIV = results4.getString("EggPowerIV").charAt(0);
+                            eggStaminaIV = results4.getString("EggStaminaIV").charAt(0);
                         }
                         ArrayList<String> parentAttributes = new ArrayList<String>(Arrays.asList(eggColour, eggTone, eggShiny, eggJewel));
-                        Egg egg = new Egg(parentAttributes, parentAttributes, itemID);
+                        ArrayList<Character> ivs = new ArrayList(Arrays.asList(eggSwimIV, eggFlyIV, eggRunIV, eggPowerIV, eggStaminaIV));
+                        Egg egg = new Egg(parentAttributes, parentAttributes, ivs, ivs, itemID, true);
                         bag.addItem(egg);
                     }
                 }
@@ -304,13 +338,13 @@ public class chaoGarden {
                             foundEntry = true;
                             //Update the entry
                             Statement statement3 = connection.createStatement();
-                            statement3.execute(String.format("UPDATE Chaos SET UserID = \"%d\", Nickname = \"%s\", Colour = \"%s\", Tone = \"%s\", Shiny = \"%s\", Jewel = \"%s\", OriginalOwner = \"%s\" WHERE chaoID = \"%s\" AND originalOwner = \"%s\";", userID, chao.getNickname(), chao.getColour(), chao.getTone(), chao.getShiny(), chao.getJewel(), chao.getOriginalOwner(), chao.getChaoID(), chao.getOriginalOwner()));
+                            statement3.execute(String.format("UPDATE Chaos SET UserID = \"%d\", Nickname = \"%s\", Colour = \"%s\", Tone = \"%s\", Shiny = \"%s\", Jewel = \"%s\", OriginalOwner = \"%s\", swimIV =\"%c\", swimEV = \"%d\", flyIV =\"%c\", flyEV = \"%d\", runIV =\"%c\", runEV = \"%d\", powerIV =\"%c\", powerEV = \"%d\", staminaIV =\"%c\", staminaEV = \"%d\"  WHERE chaoID = \"%s\" AND originalOwner = \"%s\";", userID, chao.getNickname(), chao.getColour(), chao.getTone(), chao.getShiny(), chao.getJewel(), chao.getOriginalOwner(), chao.getSwimIV(), chao.getSwimEV(), chao.getFlyIV(), chao.getFlyEV(), chao.getRunIV(), chao.getRunEV(), chao.getPowerIV(), chao.getPowerEV(), chao.getStaminaIV(), chao.getStaminaEV(), chao.getChaoID(), chao.getOriginalOwner()));
                         }
                     }
                     if (!foundEntry){
                         //Create a new entry
                         Statement statement4 = connection.createStatement();
-                        statement4.execute(String.format("INSERT INTO Chaos (UserID, Nickname, Colour, Tone, Shiny, Jewel, OriginalOwner) VALUES (\"%d\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\");", userID, chao.getNickname(), chao.getColour(), chao.getTone(), chao.getShiny(), chao.getJewel(), chao.getOriginalOwner()));                      
+                        statement4.execute(String.format("INSERT INTO Chaos (UserID, Nickname, Colour, Tone, Shiny, Jewel, OriginalOwner, SwimIV, SwimEV, FlyIV, FlyEV, RunIV, RunEV, PowerIV, PowerEV, StaminaIV, StaminaEV) VALUES (\"%d\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%c\", \"%d\", \"%c\", \"%d\", \"%c\", \"%d\", \"%c\", \"%d\", \"%c\", \"%d\");", userID, chao.getNickname(), chao.getColour(), chao.getTone(), chao.getShiny(), chao.getJewel(), chao.getOriginalOwner(), chao.getSwimIV(), chao.getSwimEV(), chao.getFlyIV(), chao.getFlyEV(), chao.getRunIV(), chao.getRunEV(), chao.getPowerIV(), chao.getPowerEV(), chao.getStaminaIV(), chao.getStaminaEV()));                      
                     }
                 }
             
@@ -328,7 +362,7 @@ public class chaoGarden {
                         itemType = "Egg";
                         Egg egg = (Egg)item;
                         Statement statement7 = connection.createStatement();
-                        statement7.execute(String.format("INSERT INTO BagItems (ItemType, UserID, EggColour, EggTone, EggShiny, EggJewel) VALUES (\"%s\", \"%d\", \"%s\", \"%s\", \"%s\", \"%s\");", itemType, userID, egg.getColour(), egg.getTone(), egg.getShiny(), egg.getJewel()));
+                        statement7.execute(String.format("INSERT INTO BagItems (ItemType, UserID, EggColour, EggTone, EggShiny, EggJewel, EggSwimIV, EggFlyIV, EggRunIV, EggPowerIV, EggStaminaIV) VALUES (\"%s\", \"%d\", \"%s\", \"%s\", \"%s\", \"%s\", \"%c\", \"%c\", \"%c\", \"%c\", \"%c\");", itemType, userID, egg.getColour(), egg.getTone(), egg.getShiny(), egg.getJewel(), egg.getSwimIV(), egg.getFlyIV(), egg.getRunIV(), egg.getPowerIV(), egg.getStaminaIV()));
                     }
                     ///similar statements for other items - itemtype and userid must be added
                       
@@ -591,7 +625,9 @@ N. No
                     }
                     //Eggs created in this way are those bought in the shop so they do not require two sets of attributes
                     ArrayList<String> parentAttributes = new ArrayList(Arrays.asList(colour, tone, shiny, jewel));
-                    Egg egg = new Egg(parentAttributes, parentAttributes, -1);
+                    //Eggs bought in the shop have all IVs C
+                    ArrayList<Character> parentIVs = new ArrayList(Arrays.asList('C', 'C', 'C', 'C', 'C'));
+                    Egg egg = new Egg(parentAttributes, parentAttributes, parentIVs, parentIVs, -1, true);
                     return egg;
                 }
                 ///etc
