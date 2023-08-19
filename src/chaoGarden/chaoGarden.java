@@ -669,9 +669,8 @@ N. No
             //The main control flow for the game
             
             //Connect to the database
-            String url = "jdbc:mysql://132.145.50.130:3306/chaoGardenDatabase?enabledTLSProtocols=TLSv1.2";
-            String user = "java";
-            String pass = "password"; 
+            ///String url = "jdbc:mysql://132.145.50.130:3306/chaoGardenDatabase?enabledTLSProtocols=TLSv1.2";
+            ///add connection details when working privately
             Connection connection;
             try {
                 connection = DriverManager.getConnection(url, user, pass);
@@ -787,7 +786,8 @@ Q. Quit
                     }
                 }
             } 
-            catch (SQLException e) {
+            ///catch (SQLException e) {
+	    catch(Exception e){
                 System.out.println("Cannot connect to the database!");
             }
 	}
